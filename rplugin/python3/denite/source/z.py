@@ -9,11 +9,14 @@ class Source(Base):
         self.kind = 'directory'
 
     def gather_candidates(self, context):
-        cmd = 'cat ~/.z | cut -d"|" -f 1 | sort | uniq'
+
+        cmd = 'cat $HOME/.z | cut -d"|" -f 1 | sort | uniq'
         proc = subprocess.Popen(
-                cmd, 
-                shell=True, 
+                cmd,
+                shell=True,
                 stdout=subprocess.PIPE,
                 universal_newlines=True)
-        path = proc.comminucate().split()
-        return [{'word': path, 'action__path': path}]
+        out, error = proc.communicate()
+        return [{'word': path, 'action__path': path}
+                for path
+                in out.split('\n')]
